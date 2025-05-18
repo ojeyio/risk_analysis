@@ -8,15 +8,27 @@ import tempfile
 st.set_page_config(layout="wide")
 st.title("Portfolio Risk and Stress Testing")
 
-# === Sidebar Input ===
 st.sidebar.header("Input Parameters")
-start_date = st.sidebar.date_input("Start Date", pd.to_datetime("2006-01-01"))
-end_date = st.sidebar.date_input("End Date", pd.to_datetime("2024-01-01"))
-tau = st.sidebar.number_input("Investment Horizon (days)", value=365 * 3)
-delta = st.sidebar.number_input("Rolling Window (days)", value=22)
+start_date = st.sidebar.date_input("Start Date", pd.to_datetime("2006-01-01"),
+                                   min_value=pd.to_datetime("2006-01-01"),
+                                   max_value=pd.to_datetime("2024-12-30"))
+end_date = st.sidebar.date_input("End Date", pd.to_datetime("2024-01-01"),
+                                 min_value=pd.to_datetime("2006-01-01"),
+                                 max_value=pd.to_datetime("2024-12-30"))
+tau = st.sidebar.selectbox("Investment Horizon (days)", [365, 1095, 1825], index=1)
+delta = st.sidebar.selectbox("Rolling Window (δ)", [1, 5, 22, 66], index=2)
 alpha = st.sidebar.slider("Confidence Level", 0.90, 0.99, 0.95)
-fund_ids = st.sidebar.text_input("Fund IDs", "B00241,B01157,B07223,B10363,B12997,B14867").split(",")
-weights = np.array(list(map(float, st.sidebar.text_input("Weights", "0.15,0.15,0.2,0.1,0.25,0.15").split(","))))
+
+fund_ids_str = st.sidebar.text_input("Fund IDs (comma-separated)", "B00241,B01157,B07223,B10363,B12997,B14867")
+fund_ids = [x.strip() for x in fund_ids_str.split(",") if x.strip()]
+if not (1 <= len(fund_ids) <= 50):
+    st.sidebar.error("You must enter between 1 and 50 fund IDs.")
+
+weights_str = st.sidebar.text_input("Portfolio Weights (must sum to 1)", "0.15,0.15,0.2,0.1,0.25,0.15")
+weights = list(map(float, weights_str.split(",")))
+if abs(sum(weights) - 1) > 1e-6:
+    st.sidebar.error("Weights must sum to 1.")
+weights = np.array(weights)
 
 # === Load Data (Fixed Path) ===
 def load_fund_data(filename, group):
@@ -110,4 +122,10 @@ with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         pdf.savefig()
         plt.close()
 
-    st.download_button("Download PDF Report", tmp.name, file_name="VaR_CVaR_Report.pdf")
+    with open(tmp.name, "rb") as f:
+    st.download_button(
+        label="Download PDF Report",
+        data=f.read(),
+        file_name="VaR_CVaR_Report.pdf",
+        mime="application/pdf"
+    )
