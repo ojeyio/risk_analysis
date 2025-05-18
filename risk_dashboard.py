@@ -123,7 +123,7 @@ with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         plt.close()
 
     with open(tmp.name, "rb") as f:
-    st.download_button(
+        st.download_button(
         label="Download PDF Report",
         data=f.read(),
         file_name="VaR_CVaR_Report.pdf",
