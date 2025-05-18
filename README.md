@@ -9,7 +9,7 @@ This project estimates portfolio risk using Value-at-Risk (VaR) and Conditional 
 - Generates a downloadable PDF report
 - Accepts user-defined parameters (dates, weights, confidence level)
 - Works in:
-  - Command-line / Python IDE (`risk_analysis.py`)
+  - Command-line / Python IDE (`risk_analysis.ipynb`)
   - Web app via Streamlit (`risk_dashboard.py`)
 
 ---
@@ -17,7 +17,7 @@ This project estimates portfolio risk using Value-at-Risk (VaR) and Conditional 
 ## File Structure
 
 project_folder/
-├── risk_analysis.py
+├── risk_analysis.ipynb
 ├── risk_dashboard.py
 ├── large_cap.csv
 ├── mid_cap.csv
